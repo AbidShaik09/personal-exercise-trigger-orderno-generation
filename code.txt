@@ -1,0 +1,21 @@
+USE [actalent]
+GO
+/****** Object:  Trigger [dbo].[generateOID]    Script Date: 8/26/2024 5:33:39 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+ALTER trigger [dbo].[generateOID] on [dbo].[orders]
+instead of insert as 
+begin
+	declare @ordno char(10);
+	declare @orderCount int;
+	select @orderCount = count(*) from orders where orderdate = getdate();
+
+	set @ordno = concat('O',FORMAT(getdate(),'yyMMdd'),@orderCount);
+	
+
+	insert into orders(ordno,customername,orderdate,gross_amount) select @ordno, customername,getdate(),gross_amount from inserted;
+	
+end
